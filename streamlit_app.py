@@ -25,7 +25,7 @@ def is_within_work_hours():
     now = datetime.datetime.now(arizona_tz)
     current_time = now.time()
     start_time = dtt(7, 0)  # 7 AM
-    end_time = dtt(16, 0)   # 4 PM
+    end_time = dtt(19, 0)   # 4 PM
 
     # Check if it's a weekday and within work hours
     return now.weekday() < 5 and start_time <= current_time <= end_time
@@ -507,6 +507,6 @@ with col3:
 if is_within_work_hours():
     # st_autorefresh will automatically rerun the app every 300 seconds (5 minutes)
     count = st_autorefresh(interval=300 * 1000, limit=None, key="autorefresh")
-    st.write("Page will refresh every 5 minutes between 7 AM and 4 PM on weekdays.")
+    st.write("Page will refresh every 5 minutes between 7 AM and 7 PM on weekdays.")
 else:
     st.write("Outside of working hours, the page will not refresh.")
