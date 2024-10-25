@@ -18,7 +18,7 @@ tenant = st.secrets["tenant"]
 st_app_key = st.secrets["st_app_key"]
 token_url = 'https://auth.servicetitan.io/connect/token'
 
-
+st.set_page_config(layout="wide")
 
 # Function to check if the current time is within 7 AM to 4 PM on weekdays
 def is_within_work_hours():
