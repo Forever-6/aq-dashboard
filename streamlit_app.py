@@ -330,6 +330,7 @@ st.markdown("""
         border-radius: 10px;
         box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.4);
         margin: 10px;
+        color: #333;
         text-align: center;
         width: 100%;
         max-width: 100%;
@@ -339,6 +340,7 @@ st.markdown("""
         display: flex;
         justify-content: space-between;
         align-items: center;
+        color: #333;
         padding: 10px;
         border-radius: 10px;
         flex-grow: 1;
@@ -404,43 +406,6 @@ st.markdown("""
         padding-right: 10px;
     }
 
-    /* Make layout responsive on mobile devices */
-    @media screen and (max-width: 768px) {
-        .metric-container {
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
-        }
-        .metric-label, .metric-value, .label-header, .metric-header {
-            font-size: 20px;
-        }
-        .metric-delta {
-            font-size: 14px;
-        }
-        .card {
-            margin: 5px;
-            padding: 15px;
-        }
-    }
-
-    @media screen and (max-width: 480px) {
-        .metric-label, .metric-value, .label-header, .metric-header {
-            font-size: 18px;
-        }
-        .metric-delta {
-            font-size: 12px;
-        }
-        .title {
-            font-size: 28px;
-        }
-        .last-updated {
-            font-size: 14px;
-        }
-        .card {
-            padding: 10px;
-            margin: 5px;
-        }
-    }
     </style>
 """, unsafe_allow_html=True)
 
