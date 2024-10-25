@@ -321,7 +321,6 @@ check_and_celebrate("L3 Op Today", metric_L3_Op_today, target_L3_Op, today_name,
 
 
 
-
 # Custom CSS for a horizontal metric layout and card styling
 st.markdown("""
     <style>
@@ -343,16 +342,19 @@ st.markdown("""
         padding: 10px;
         border-radius: 10px;
         flex-grow: 1;
+        flex-wrap: wrap;
     }
     .metric-label {
         font-size: 24px;
         font-weight: bold;
+        color: #333;
         text-align: left;
         flex: 1;
     }
     .label-header {
         font-size: 24px;
         font-weight: normal;
+        color: #333;
         text-align: center;
         flex: 1;
     }
@@ -401,8 +403,47 @@ st.markdown("""
         text-align: right;
         padding-right: 10px;
     }
+
+    /* Make layout responsive on mobile devices */
+    @media screen and (max-width: 768px) {
+        .metric-container {
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .metric-label, .metric-value, .label-header, .metric-header {
+            font-size: 20px;
+        }
+        .metric-delta {
+            font-size: 14px;
+        }
+        .card {
+            margin: 5px;
+            padding: 15px;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .metric-label, .metric-value, .label-header, .metric-header {
+            font-size: 18px;
+        }
+        .metric-delta {
+            font-size: 12px;
+        }
+        .title {
+            font-size: 28px;
+        }
+        .last-updated {
+            font-size: 14px;
+        }
+        .card {
+            padding: 10px;
+            margin: 5px;
+        }
+    }
     </style>
 """, unsafe_allow_html=True)
+
 
 # Layout with title and Last Updated message
 col1, col2 = st.columns([4, 6])
