@@ -4,6 +4,8 @@ import requests
 import time
 from dateutil import parser
 from pytz import timezone
+from streamlit_autorefresh import st_autorefresh
+from datetime import time as dtt
 
 # Arizona Timezone
 arizona_tz = timezone('America/Phoenix')
@@ -16,36 +18,29 @@ tenant = st.secrets["tenant"]
 st_app_key = st.secrets["st_app_key"]
 token_url = 'https://auth.servicetitan.io/connect/token'
 
-# Get the current time in Arizona timezone
-now = datetime.datetime.now(arizona_tz)
-
-# Define working hours (7 AM to 4 PM) in Arizona time
-start_time = now.replace(hour=7, minute=0, second=0, microsecond=0)
-end_time = now.replace(hour=16, minute=0, second=0, microsecond=0)
 
 
-st.markdown(
-    """
-    <script>
-    function reloadPage() {
-        window.location.reload();
-    }
-    setTimeout(reloadPage, 300000);  // Refresh page every 5 minutes
-    </script>
-    """,
-    unsafe_allow_html=True
-)
+# Function to check if the current time is within 7 AM to 4 PM on weekdays
+def is_within_work_hours():
+    now = datetime.datetime.now(arizona_tz)
+    current_time = now.time()
+    start_time = dtt(7, 0)  # 7 AM
+    end_time = dtt(16, 0)   # 4 PM
+
+    # Check if it's a weekday and within work hours
+    return now.weekday() < 5 and start_time <= current_time <= end_time
+
 
 
 # Parameterized tagTypeIds for Op levels
 TAG_TYPE_IDS = {
-    "L1_No_Op": 38473266,  # "L1 No Op"
-    "L2_No_Op": 38474803,  # "L2 No Op"
-    "L3_No_Op": 38473267,   # "L3 No Op"
+    "L1_No_Op": 74799391,  # "L1 No Op"
+    "L2_No_Op": 74798752,  # "L2 No Op"
+    "L3_No_Op": 74796076,   # "L3 No Op"
 
-    "L1_Op": 38473266,  # "L1  Op"
-    "L2_Op": 38474803,  # "L2  Op"
-    "L3_Op": 38473267   # "L3  Op"
+    "L1_Op": 74799264,  # "L1  Op"
+    "L2_Op": 74799011,  # "L2  Op"
+    "L3_Op": 74796077   # "L3  Op"
 }
 
 
@@ -180,6 +175,43 @@ def get_next_weekday(current_day, days_ahead):
             days_ahead -= 1
     return target_day
 
+
+# Determine colors for delta (red for negative, green for positive or zero)
+def get_delta_color(delta):
+    return "negative" if delta < 0 else "positive"
+
+# Celebrate function
+def celebrate(message):
+    st.toast(message, icon='🎉')
+    st.balloons()
+
+
+# Helper function to reset session state at the start of a new Arizona day
+def reset_celebration_state_if_needed():
+    st.session_state.clear()
+    if "last_celebration_reset" not in st.session_state or st.session_state.last_celebration_reset != now_arizona.date():
+        st.session_state.clear()
+        st.session_state.last_celebration_reset = now_arizona.date()
+
+# Function to track if we've already celebrated
+def check_and_celebrate(target_name, metric, target, day_name, level):
+    if target_name not in st.session_state:
+        st.session_state[target_name] = False
+    
+    current_day_name = now_arizona.strftime("%A")
+
+    if not st.session_state[target_name] and metric >= target:
+        if current_day_name == day_name:
+            celebrate(f"🎉 Congratulations, Today's Level {level} Opportunities have been achieved!")
+        else:
+            celebrate(f"🎉 Congratulations, {day_name}'s Level {level} Opportunities have been achieved!")
+        st.session_state[target_name] = True
+
+
+
+
+reset_celebration_state_if_needed()
+
 # Get today's date and calculate the next two weekdays
 today = datetime.date.today()
 next_day = get_next_weekday(today, 1)
@@ -268,9 +300,27 @@ today_name = today.strftime("%A")
 next_day_name = next_day.strftime("%A")
 third_day_name = third_day.strftime("%A")
 
-# Determine colors for delta (red for negative, green for positive or zero)
-def get_delta_color(delta):
-    return "negative" if delta < 0 else "positive"
+
+
+#Do revers order so they show up in order
+
+# Check and celebrate if targets are met (for third day)
+check_and_celebrate("L1 Op Third Day", metric_L1_Op_third_day, target_L1_Op, third_day_name, 1)
+check_and_celebrate("L2 Op Third Day", metric_L2_Op_third_day, target_L2_Op, third_day_name, 2)
+check_and_celebrate("L3 Op Third Day", metric_L3_Op_third_day, target_L3_Op, third_day_name, 3)
+
+# Check and celebrate if targets are met (for next day)
+check_and_celebrate("L1 Op Next Day", metric_L1_Op_next_day, target_L1_Op, next_day_name, 1)
+check_and_celebrate("L2 Op Next Day", metric_L2_Op_next_day, target_L2_Op, next_day_name, 2)
+check_and_celebrate("L3 Op Next Day", metric_L3_Op_next_day, target_L3_Op, next_day_name, 3)
+
+# Check and celebrate if targets are met (for today)
+check_and_celebrate("L1 Op Today", metric_L1_Op_today, target_L1_Op, today_name, 1)
+check_and_celebrate("L2 Op Today", metric_L2_Op_today, target_L2_Op, today_name, 2)
+check_and_celebrate("L3 Op Today", metric_L3_Op_today, target_L3_Op, today_name, 3)
+
+
+
 
 # Custom CSS for a horizontal metric layout and card styling
 st.markdown("""
@@ -447,21 +497,10 @@ with col3:
 
 
 
-# Check if current time is within working hours and it's a weekday (Mon-Fri)
-if now.weekday() < 5 and start_time <= now <= end_time:
-    # Add JavaScript to automatically refresh the page every 5 minutes (300000 milliseconds)
-    st.markdown(
-        """
-        <script>
-        function reloadPage() {
-            window.location.reload();
-        }
-        setTimeout(reloadPage, 300000);  // Refresh page every 5 minutes
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
+# Only auto-refresh the page every 5 minutes if within work hours
+if is_within_work_hours():
+    # st_autorefresh will automatically rerun the app every 300 seconds (5 minutes)
+    count = st_autorefresh(interval=300 * 1000, limit=None, key="autorefresh")
     st.write("Page will refresh every 5 minutes between 7 AM and 4 PM on weekdays.")
 else:
     st.write("Outside of working hours, the page will not refresh.")
-
