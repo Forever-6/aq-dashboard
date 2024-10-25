@@ -7,6 +7,7 @@ from pytz import timezone
 
 # Arizona Timezone
 arizona_tz = timezone('America/Phoenix')
+now_arizona = datetime.datetime.now(arizona_tz)
 
 # OAuth2 Configuration
 client_id = st.secrets["client_id"]
@@ -358,8 +359,7 @@ col1, col2 = st.columns([4, 6])
 with col1:
     st.markdown('<div class="title">🎈 3 Day Schedule</div>', unsafe_allow_html=True)
 with col2:
-    st.markdown(f'<div class="last-updated">Last Updated: {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}</div>', unsafe_allow_html=True)
-
+    st.markdown(f'<div class="last-updated">Last Updated: {now_arizona.strftime("%Y-%m-%d %H:%M:%S")}</div>', unsafe_allow_html=True)
 
 # Layout using columns
 col1, col2, col3 = st.columns([2, 2, 2])
