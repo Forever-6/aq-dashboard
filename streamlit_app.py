@@ -188,7 +188,7 @@ def celebrate(message):
 
 # Helper function to reset session state at the start of a new Arizona day
 def reset_celebration_state_if_needed():
-    st.session_state.clear()
+    #st.session_state.clear()
     if "last_celebration_reset" not in st.session_state or st.session_state.last_celebration_reset != now_arizona.date():
         st.session_state.clear()
         st.session_state.last_celebration_reset = now_arizona.date()
